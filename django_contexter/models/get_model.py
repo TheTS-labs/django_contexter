@@ -1,0 +1,55 @@
+import django
+from django.conf import settings
+from rest_framework import status
+
+from .errors.err_codes import MODEL_DOES_NOT_EXIST
+from .errors.request_error import RequestError
+from .part_of.get_model.configuration import Configuration
+from .part_of.get_model.reject import Reject
+
+
+class GetModel(Configuration, Reject):
+    def __init__(self, modelName):
+        self.modelName = modelName
+        self.allowed_models = settings.CONTEXTER_ACCESS_POLICY["allow_models"]
+        self.rejected_models = settings.CONTEXTER_ACCESS_POLICY["reject_models"]
+
+        self.check_models_policy()
+
+    def get_model_by_path(self):
+        try:
+            return django.apps.apps.get_model(self.modelName)
+        except LookupError:
+            raise RequestError(
+                f"There is no model named {self.modelName}",
+                MODEL_DOES_NOT_EXIST,
+                status.HTTP_400_BAD_REQUEST,
+            )
+
+    def check_models_policy(self):
+        """Checks the Access Policy for the model"""
+        self._all_at_the_same_time()
+        self._allowed_and_rejected_at_the_same_time()
+        self._all_and_remaining_at_the_same_time()
+
+        # Warning! rejected_models are always a higher priority
+
+        self._model_rejected()
+        self._remaining_and_not_allowed()
+        self._undeclared()
+
+    @property
+    def model(self):
+        return self.get_model_by_path()
+
+    @property
+    def props(self):
+        rejected_models = settings.CONTEXTER_ACCESS_POLICY["reject_models"]
+
+        if (
+            rejected_models == "__undeclared__"
+            and self.modelName in settings.CONTEXTER_ACCESS_POLICY
+        ):
+            return settings.CONTEXTER_ACCESS_POLICY[self.modelName]
+
+        return None
