@@ -162,3 +162,18 @@ class GetModelTestCase(TestCase):
 
         for method in ALL_METHODS - ALL_UNSAFE_METHODS:
             self.assertEqual(changer.check_method(method), True)
+
+    def test_part__remaining_and_not_allowed(self):
+        policy = {
+            "allow_methods": ALL_SAFE_METHODS,
+            "allow_models": ["auth.User"],
+            "reject_models": "__remaining__",
+        }
+
+        self.changeConfiguration(policy)
+
+        with self.assertRaises(RejectError):
+            try:
+                GetModel("auth.Permission").model
+            except RejectError as exc:
+                raise exc
