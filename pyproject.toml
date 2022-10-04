@@ -18,6 +18,9 @@ pre-commit = "^2.20.0"
 black = "^22.8.0"
 redgreenunittest = "^0.1.1"
 coverage = "^6.5.0"
+sphinx-autobuild = "^2021.3.14"
+sphinx-rtd-theme = "^1.0.0"
+Sphinx = "^5.2.3"
 
 
 
