@@ -2,6 +2,8 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
+from django_contexter.models.errors.request_error import RequestError
+
 from ..errors.configuration_error import ConfigurationError
 from ..errors.reject_error import RejectError
 from ..get_model import GetModel
@@ -84,3 +86,35 @@ class GetModelTestCase(TestCase):
                 GetModel("auth.Permission").model
             except ConfigurationError as exc:
                 raise exc
+
+    def test_lookup_error(self):
+        with self.assertRaises(RequestError):
+            try:
+                GetModel("model.NotExists").model
+            except RequestError as exc:
+                raise exc
+
+    def test_wrong_paths(self):
+        with self.assertRaises(RequestError):
+            try:
+                GetModel("model.Not.Exists").model
+            except RequestError as exc:
+                raise exc
+
+        with self.assertRaises(RequestError):
+            try:
+                GetModel("model_NotExists").model
+            except RequestError as exc:
+                raise exc
+
+    def test_empty_props(self):
+        policy = {
+            "allow_methods": "__all__",
+            "allow_models": "__all__",
+            "reject_models": "__undeclared__",
+            "auth.Permission": {"testProps": True},
+        }
+
+        self.changeConfiguration(policy)
+
+        self.assertEqual(GetModel("auth.Permission").props, {"testProps": True})

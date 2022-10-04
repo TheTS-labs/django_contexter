@@ -19,7 +19,7 @@ class GetModel(Configuration, Reject):
     def get_model_by_path(self):
         try:
             return django.apps.apps.get_model(self.modelName)
-        except LookupError:
+        except (LookupError, ValueError):
             raise RequestError(
                 f"There is no model named {self.modelName}",
                 MODEL_DOES_NOT_EXIST,
@@ -44,12 +44,7 @@ class GetModel(Configuration, Reject):
 
     @property
     def props(self):
-        rejected_models = settings.CONTEXTER_ACCESS_POLICY["reject_models"]
-
-        if (
-            rejected_models == "__undeclared__"
-            and self.modelName in settings.CONTEXTER_ACCESS_POLICY
-        ):
+        if self.modelName in settings.CONTEXTER_ACCESS_POLICY:
             return settings.CONTEXTER_ACCESS_POLICY[self.modelName]
 
         return None
