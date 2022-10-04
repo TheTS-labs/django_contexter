@@ -30,5 +30,10 @@ class Configuration:
             )
 
     def _all_and_remaining_at_the_same_time(self):
-        if self.allowed_models == "__all__" and self.rejected_models == "__remaining__":
+        if (
+            self.allowed_models == "__all__"
+            and self.rejected_models == "__remaining__"
+            or self.rejected_models == "__all__"
+            and self.allowed_models == "__remaining__"
+        ):
             raise ConfigurationError("Using __all__ with __remaining__ will not work")

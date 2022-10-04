@@ -133,12 +133,12 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# auth.Permission, __undeclared__, __all__, __remaining__, __undeclared-and-remaining__
+# auth.Permission, __undeclared__, __all__, __remaining__
 
 CONTEXTER_ACCESS_POLICY = {
     "allow_methods": ALL_SAFE_METHODS,  # or __all__
     "allow_models": "__all__",  # or ["auth.User"]
-    "reject_models": [],  # or ["auth.User"], or ["__remaining__"]
+    "reject_models": "__uneclared__",  # or ["auth.User"], or ["__remaining__"]
     # "auth.Permission": {
     #     "allow_methods": ALL_SAFE_METHODS,
     #     "hidden_fields": ["codename"],

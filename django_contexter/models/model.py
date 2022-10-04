@@ -53,8 +53,6 @@ class Model(Configuration, Reject):
         # Warning! rejected_models are always a higher priority
 
         self._model_rejected()
-        self._remaining_and_not_allowed()
-        self._undeclared()
 
     @property
     def model(self):
