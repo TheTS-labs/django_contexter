@@ -3,6 +3,11 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from django_contexter.models.errors.request_error import RequestError
+from django_contexter.models.method_types import (
+    ALL_METHODS,
+    ALL_SAFE_METHODS,
+    ALL_UNSAFE_METHODS,
+)
 
 from ..errors.configuration_error import ConfigurationError
 from ..errors.reject_error import RejectError
@@ -118,3 +123,42 @@ class GetModelTestCase(TestCase):
         self.changeConfiguration(policy)
 
         self.assertEqual(GetModel("auth.Permission").props, {"testProps": True})
+
+    def test_reject_method(self):
+        policy = {
+            "allow_methods": "__all__",
+            "allow_models": "__all__",
+            "reject_models": "__undeclared__",
+            "auth.Permission": {
+                "allow_methods": ALL_SAFE_METHODS,
+            },
+        }
+
+        self.changeConfiguration(policy)
+
+        changer = GetModel("auth.Permission")
+
+        with self.assertRaises(RejectError):
+            for method in ALL_METHODS - ALL_SAFE_METHODS:
+                changer.check_method(method)
+
+        for method in ALL_METHODS - ALL_UNSAFE_METHODS:
+            self.assertEqual(changer.check_method(method), True)
+
+    def test_reject_method_with_empty_props(self):
+        policy = {
+            "allow_methods": ALL_SAFE_METHODS,
+            "allow_models": "__all__",
+            "reject_models": [],
+        }
+
+        self.changeConfiguration(policy)
+
+        changer = GetModel("auth.Permission")
+
+        with self.assertRaises(RejectError):
+            for method in ALL_METHODS - ALL_SAFE_METHODS:
+                changer.check_method(method)
+
+        for method in ALL_METHODS - ALL_UNSAFE_METHODS:
+            self.assertEqual(changer.check_method(method), True)

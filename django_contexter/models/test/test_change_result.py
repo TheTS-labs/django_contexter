@@ -17,18 +17,6 @@ class ChangeResultTestCase(TestCase):
         changer = ChangeResult(None, Permission, None)
         self.assertEqual(changer.fix_fields(Permission.objects), Permission.objects)
 
-    def test_reject_method(self):
-        changer = ChangeResult(
-            {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": []}, Permission, None
-        )
-
-        with self.assertRaises(RejectError):
-            for method in ALL_METHODS - ALL_SAFE_METHODS:
-                changer.check_method(method)
-
-        for method in ALL_METHODS - ALL_UNSAFE_METHODS:
-            self.assertEqual(changer.check_method(method), True)
-
     def test_hide_first(self):
         hide = ["codename"]
         changer = ChangeResult(
@@ -72,7 +60,7 @@ class ChangeResultTestCase(TestCase):
                 attrgetter(*fields_list)(record),
             )
 
-    def test_mulriple_hide(self):
+    def test_multiple_hide(self):
         hide = ["codename", "name"]
         changer = ChangeResult(
             {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": hide},
@@ -91,6 +79,52 @@ class ChangeResultTestCase(TestCase):
         self.assertNotEqual(fixed_fields.name, records.first().name)
         self.assertEqual(fixed_fields.codename, "*" * len(hide[0]))
         self.assertEqual(fixed_fields.name, "*" * len(hide[1]))
+        self.assertEqual(
+            attrgetter(*fields_list)(fixed_fields),
+            attrgetter(*fields_list)(records.first()),
+        )
+
+    def test_empty_props(self):
+        hide = ["codename", "name"]
+        changer = ChangeResult(
+            {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": hide},
+            Permission,
+            None,
+        )
+
+        records = Permission.objects
+        fixed_fields = changer.fix_fields(records.all().first())
+
+        fields_list = [field.name for field in Permission._meta.fields]
+        del fields_list[fields_list.index(hide[0])]
+        del fields_list[fields_list.index(hide[1])]
+
+        self.assertNotEqual(fixed_fields.codename, records.first().codename)
+        self.assertNotEqual(fixed_fields.name, records.first().name)
+        self.assertEqual(fixed_fields.codename, "*" * len(hide[0]))
+        self.assertEqual(fixed_fields.name, "*" * len(hide[1]))
+        self.assertEqual(
+            attrgetter(*fields_list)(fixed_fields),
+            attrgetter(*fields_list)(records.first()),
+        )
+
+    def test_custom_hide(self):
+        def hide(full_result, model, props, field, request):
+            return "HIDED"
+
+        changer = ChangeResult(
+            {"allow_methods": ALL_SAFE_METHODS, "codename": hide, "hidden_fields": []},
+            Permission,
+            None,
+        )
+
+        records = Permission.objects
+        fixed_fields = changer.fix_fields(records.all().first())
+
+        fields_list = [field.name for field in Permission._meta.fields]
+        del fields_list[fields_list.index("codename")]
+
+        self.assertEqual(fixed_fields.codename, "HIDED")
         self.assertEqual(
             attrgetter(*fields_list)(fixed_fields),
             attrgetter(*fields_list)(records.first()),

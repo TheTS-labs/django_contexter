@@ -61,7 +61,7 @@ def index(request):
 
         try:
             request_function_name = "".join(filter(lambda x: not x.isdigit(), key))
-            changer.check_method(request_function_name)
+            gm.check_method(request_function_name)
             request_function = getattr(result, request_function_name)
             result = request_function(**model_request)
         except AttributeError as exc:

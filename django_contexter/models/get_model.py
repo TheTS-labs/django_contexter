@@ -2,6 +2,8 @@ import django
 from django.conf import settings
 from rest_framework import status
 
+from django_contexter.models.errors.reject_error import RejectError
+
 from .errors.err_codes import MODEL_DOES_NOT_EXIST
 from .errors.request_error import RequestError
 from .part_of.get_model.configuration import Configuration
@@ -15,6 +17,16 @@ class GetModel(Configuration, Reject):
         self.rejected_models = settings.CONTEXTER_ACCESS_POLICY["reject_models"]
 
         self.check_models_policy()
+
+    def check_method(self, method):
+        if self.props is None or self.props == {}:
+            if method not in settings.CONTEXTER_ACCESS_POLICY["allow_methods"]:
+                raise RejectError("API Method not allowed", method)
+        else:
+            if method not in self.props["allow_methods"]:
+                raise RejectError("API Method not allowed for this model", method)
+
+        return True
 
     def get_model_by_path(self):
         try:
