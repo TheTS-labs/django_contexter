@@ -12,12 +12,11 @@ class SerializerTestCase(TestCase):
             "password": "johnpassword",
         }
 
-        self.user_serialized = [{"username": "john", "email": "lennon@thebeatles.com"}]
+        self.user_serialized = {"username": "john", "email": "lennon@thebeatles.com"}
 
         self.user = User.objects.create_user(**self.user_attributes)
         self.serializer = Serializer(
-            [self.user],
-            many=True,
+            self.user,
             context={"model": User, "fields": ["username", "email"]},
         )
 

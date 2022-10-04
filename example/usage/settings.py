@@ -137,15 +137,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CONTEXTER_ACCESS_POLICY = {
     "allow_methods": ALL_SAFE_METHODS,  # or __all__
-    "allow_models": [],  # or ["auth.User"]
-    "reject_models": "__undeclared__",  # or ["auth.User"], or ["__remaining__"]
-    "auth.Permission": {
-        "allow_methods": ALL_SAFE_METHODS,
-        "hidden_fields": ["codename"],
-    },
+    "allow_models": "__all__",  # or ["auth.User"]
+    "reject_models": [],  # or ["auth.User"], or ["__remaining__"]
+    # "auth.Permission": {
+    #     "allow_methods": ALL_SAFE_METHODS,
+    #     "hidden_fields": ["codename"],
+    # },
 }
-
-# def check_function(request, model):
-#     # True - Accept
-#     # False - Reject
-#     ...

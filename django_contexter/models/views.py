@@ -1,6 +1,6 @@
 import json
 
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -70,7 +70,7 @@ def index(request):
                 FUNCTION_DOES_NOT_EXIST_IN_QUERYSET_API,
                 status.HTTP_400_BAD_REQUEST,
             ) from exc
-        except FieldError as err:
+        except (FieldError, ObjectDoesNotExist) as err:
             raise RequestError(
                 err.args[0], FIELD_ERROR, status.HTTP_400_BAD_REQUEST
             ) from err
