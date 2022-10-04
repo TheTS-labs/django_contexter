@@ -17,12 +17,13 @@ jobs:
     - name: Generate coverage report
       run: |
         poetry run poetry install
-        poetry run coverage run --branch -a --source='./django_contexter/' ./example/manage.py test django_contexter
+        poetry run coverage run --branch --source='./django_contexter/' ./example/manage.py test django_contexter
+        poetry run coverage xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        files: .coverage
+        files: coverage.xml
         fail_ci_if_error: true
         flags: unittests
         name: codecov-umbrella
