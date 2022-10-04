@@ -1,8 +1,3 @@
-from django.conf import settings
-
-from .errors.reject_error import RejectError
-
-
 class ChangeResult:
     """Change result with custom Access Policy"""
 

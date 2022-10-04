@@ -10,7 +10,7 @@ from .part_of.get_model.configuration import Configuration
 from .part_of.get_model.reject import Reject
 
 
-class GetModel(Configuration, Reject):
+class Model(Configuration, Reject):
     def __init__(self, modelName):
         self.modelName = modelName
         self.allowed_models = settings.CONTEXTER_ACCESS_POLICY["allow_models"]

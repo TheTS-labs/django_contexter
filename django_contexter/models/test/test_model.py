@@ -11,10 +11,10 @@ from django_contexter.models.method_types import (
 
 from ..errors.configuration_error import ConfigurationError
 from ..errors.reject_error import RejectError
-from ..get_model import GetModel
+from ..model import Model
 
 
-class GetModelTestCase(TestCase):
+class ModelTestCase(TestCase):
     def changeConfiguration(self, conf):
         settings.CONTEXTER_ACCESS_POLICY = conf
 
@@ -27,10 +27,10 @@ class GetModelTestCase(TestCase):
 
         self.changeConfiguration(policy)
 
-        gm = GetModel("auth.Permission")
+        model = Model("auth.Permission")
 
-        self.assertEqual(gm.props, None)
-        self.assertEqual(gm.model, Permission)
+        self.assertEqual(model.props, None)
+        self.assertEqual(model.model, Permission)
 
     def test_wrong_config_all(self):
         policy = {
@@ -43,7 +43,7 @@ class GetModelTestCase(TestCase):
 
         with self.assertRaises(ConfigurationError):
             try:
-                GetModel("auth.Permission").model
+                Model("auth.Permission").model
             except ConfigurationError as exc:
                 raise exc
 
@@ -58,7 +58,7 @@ class GetModelTestCase(TestCase):
 
         with self.assertRaises(ConfigurationError):
             try:
-                GetModel("auth.Permission").model
+                Model("auth.Permission").model
             except ConfigurationError as exc:
                 raise exc
 
@@ -73,7 +73,7 @@ class GetModelTestCase(TestCase):
 
         with self.assertRaises(RejectError):
             try:
-                GetModel("auth.Permission").model
+                Model("auth.Permission").model
             except RejectError as exc:
                 raise exc
 
@@ -88,27 +88,27 @@ class GetModelTestCase(TestCase):
 
         with self.assertRaises(ConfigurationError):
             try:
-                GetModel("auth.Permission").model
+                Model("auth.Permission").model
             except ConfigurationError as exc:
                 raise exc
 
     def test_lookup_error(self):
         with self.assertRaises(RequestError):
             try:
-                GetModel("model.NotExists").model
+                Model("model.NotExists").model
             except RequestError as exc:
                 raise exc
 
     def test_wrong_paths(self):
         with self.assertRaises(RequestError):
             try:
-                GetModel("model.Not.Exists").model
+                Model("model.Not.Exists").model
             except RequestError as exc:
                 raise exc
 
         with self.assertRaises(RequestError):
             try:
-                GetModel("model_NotExists").model
+                Model("model_NotExists").model
             except RequestError as exc:
                 raise exc
 
@@ -122,7 +122,7 @@ class GetModelTestCase(TestCase):
 
         self.changeConfiguration(policy)
 
-        self.assertEqual(GetModel("auth.Permission").props, {"testProps": True})
+        self.assertEqual(Model("auth.Permission").props, {"testProps": True})
 
     def test_reject_method(self):
         policy = {
@@ -136,7 +136,7 @@ class GetModelTestCase(TestCase):
 
         self.changeConfiguration(policy)
 
-        changer = GetModel("auth.Permission")
+        changer = Model("auth.Permission")
 
         with self.assertRaises(RejectError):
             for method in ALL_METHODS - ALL_SAFE_METHODS:
@@ -154,14 +154,14 @@ class GetModelTestCase(TestCase):
 
         self.changeConfiguration(policy)
 
-        gm = GetModel("auth.Permission")
+        model = Model("auth.Permission")
 
         with self.assertRaises(RejectError):
             for method in ALL_METHODS - ALL_SAFE_METHODS:
-                gm.check_method(method)
+                model.check_method(method)
 
         for method in ALL_METHODS - ALL_UNSAFE_METHODS:
-            self.assertEqual(gm.check_method(method), True)
+            self.assertEqual(model.check_method(method), True)
 
     def test_part__remaining_and_not_allowed(self):
         policy = {
@@ -174,7 +174,7 @@ class GetModelTestCase(TestCase):
 
         with self.assertRaises(RejectError):
             try:
-                GetModel("auth.Permission").model
+                Model("auth.Permission").model
             except RejectError as exc:
                 raise exc
 
@@ -187,7 +187,7 @@ class GetModelTestCase(TestCase):
 
         self.changeConfiguration(policy)
 
-        gm = GetModel("auth.Permission")
+        model = Model("auth.Permission")
 
         for method in ALL_METHODS - ALL_UNSAFE_METHODS:
-            self.assertEqual(gm.check_method(method), True)
+            self.assertEqual(model.check_method(method), True)

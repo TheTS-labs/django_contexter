@@ -14,7 +14,7 @@ from .errors.err_codes import (
 )
 from .errors.reject_error import RejectError
 from .errors.request_error import RequestError
-from .get_model import GetModel
+from .model import Model
 from .serializer import Serializer
 
 
@@ -47,11 +47,10 @@ def index(request):
             status.HTTP_400_BAD_REQUEST,
         )
 
-    gm = GetModel(request.GET.get("modelName"))
-    model = gm.model
-    changer = ChangeResult(gm.props, model, request)
+    model = Model(request.GET.get("modelName"))
+    changer = ChangeResult(model.props, model.model, request)
 
-    result = model.objects
+    result = model.model.objects
 
     for key in exclude_keys(request.GET, ["modelName"]):
         try:
@@ -61,7 +60,7 @@ def index(request):
 
         try:
             request_function_name = "".join(filter(lambda x: not x.isdigit(), key))
-            gm.check_method(request_function_name)
+            model.check_method(request_function_name)
             request_function = getattr(result, request_function_name)
             result = request_function(**model_request)
         except AttributeError as exc:
@@ -80,9 +79,9 @@ def index(request):
     return Response(
         Serializer(
             instance=result,
-            many=not isinstance(result, model),
+            many=not isinstance(result, model.model),
             context={
-                "model": model,
+                "model": model.model,
                 "fields": "__all__",
             },
         ).data
