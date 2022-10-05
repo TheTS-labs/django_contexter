@@ -42,13 +42,14 @@ Aliases
     | Aliases **only** work with ``allow_models`` and ``reject_models``
     | For methods use :ref:`QuerySet-API-method-lists`
 
-``__all__``, ``__remaining__``, and ``__undeclared__`` are aliases
+``__all__``, ``__remaining__``, ``__any__`` and ``__undeclared__`` are aliases
 
 During processing, these aliases are replaced by lists:
 
 * ``__all__`` is replaced by a list with **all** the models Django ORM knows about
 * ``__remaining__`` is replaced by all models *excluding the opposite setting*
 * ``__undeclared__`` is replaced by the list of models that are recorded extended
+* ``__any__`` specifically for allow_methods allows **any** method
 
 Global models access
 --------------------

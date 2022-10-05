@@ -15,7 +15,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from django_contexter.models.method_types import ALL_SAFE_METHODS
+from django_contexter.models.method_types import ALL_METHODS
 
 load_dotenv()
 
@@ -134,7 +134,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CONTEXTER_ACCESS_POLICY = {
-    "allow_methods": ALL_SAFE_METHODS,
-    "allow_models": "__remaining__",
-    "reject_models": ["auth.User"],
+    "allow_methods": ALL_METHODS,
+    "allow_models": "__all__",
+    "reject_models": [],
 }

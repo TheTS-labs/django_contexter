@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 
 from django_contexter.models.errors.request_error import RequestError
@@ -20,7 +20,7 @@ class ModelTestCase(TestCase):
 
     def test_accesssed_path(self):
         policy = {
-            "allow_methods": "__all__",
+            "allow_methods": ALL_METHODS,
             "allow_models": ["auth.Permission"],
             "reject_models": "__remaining__",
         }
@@ -34,7 +34,7 @@ class ModelTestCase(TestCase):
 
     def test_wrong_config_all(self):
         policy = {
-            "allow_methods": "__all__",
+            "allow_methods": ALL_METHODS,
             "allow_models": "__all__",
             "reject_models": "__all__",
         }
@@ -49,7 +49,7 @@ class ModelTestCase(TestCase):
 
     def test_wrong_config_one_model(self):
         policy = {
-            "allow_methods": "__all__",
+            "allow_methods": ALL_METHODS,
             "allow_models": ["auth.Permission"],
             "reject_models": ["auth.Permission"],
         }
@@ -64,8 +64,8 @@ class ModelTestCase(TestCase):
 
     def test_rejected_model(self):
         policy = {
-            "allow_methods": "__all__",
-            "allow_models": [""],
+            "allow_methods": ALL_METHODS,
+            "allow_models": "__remaining__",
             "reject_models": ["auth.Permission"],
         }
 
@@ -77,9 +77,11 @@ class ModelTestCase(TestCase):
             except RejectError as exc:
                 raise exc
 
+        self.assertEqual(Model("auth.User").model, User)
+
     def test_all_with_remaining(self):
         policy = {
-            "allow_methods": "__all__",
+            "allow_methods": ALL_METHODS,
             "allow_models": "__all__",
             "reject_models": "__remaining__",
         }
@@ -114,8 +116,8 @@ class ModelTestCase(TestCase):
 
     def test_empty_props(self):
         policy = {
-            "allow_methods": "__all__",
-            "allow_models": "__all__",
+            "allow_methods": ALL_METHODS,
+            "allow_models": "__remaining__",
             "reject_models": "__undeclared__",
             "auth.Permission": {"testProps": True},
         }
@@ -126,8 +128,8 @@ class ModelTestCase(TestCase):
 
     def test_reject_method(self):
         policy = {
-            "allow_methods": "__all__",
-            "allow_models": "__all__",
+            "allow_methods": ALL_METHODS,
+            "allow_models": "__remaining__",
             "reject_models": "__undeclared__",
             "auth.Permission": {
                 "allow_methods": ALL_SAFE_METHODS,
@@ -136,14 +138,17 @@ class ModelTestCase(TestCase):
 
         self.changeConfiguration(policy)
 
-        changer = Model("auth.Permission")
+        model = Model("auth.Permission")
+
+        for method in ALL_METHODS - ALL_SAFE_METHODS:
+            with self.assertRaises(RejectError):
+                model.check_method(method)
 
         with self.assertRaises(RejectError):
-            for method in ALL_METHODS - ALL_SAFE_METHODS:
-                changer.check_method(method)
+            model.check_method("Method Not Exist")
 
         for method in ALL_METHODS - ALL_UNSAFE_METHODS:
-            self.assertEqual(changer.check_method(method), True)
+            self.assertEqual(model.check_method(method), True)
 
     def test_reject_method_with_empty_props(self):
         policy = {
@@ -156,9 +161,12 @@ class ModelTestCase(TestCase):
 
         model = Model("auth.Permission")
 
-        with self.assertRaises(RejectError):
-            for method in ALL_METHODS - ALL_SAFE_METHODS:
+        for method in ALL_METHODS - ALL_SAFE_METHODS:
+            with self.assertRaises(RejectError):
                 model.check_method(method)
+
+        with self.assertRaises(RejectError):
+            model.check_method("Method Not Exist")
 
         for method in ALL_METHODS - ALL_UNSAFE_METHODS:
             self.assertEqual(model.check_method(method), True)
@@ -191,3 +199,6 @@ class ModelTestCase(TestCase):
 
         for method in ALL_METHODS - ALL_UNSAFE_METHODS:
             self.assertEqual(model.check_method(method), True)
+
+        with self.assertRaises(RejectError):
+            model.check_method("Method Not Exist")

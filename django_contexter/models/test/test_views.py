@@ -182,7 +182,7 @@ class ViewsTestCase(TestCase):
     def test_attr_error(self):
         self.changeConfiguration(
             {
-                "allow_methods": "__all__",
+                "allow_methods": "__any__",
                 "allow_models": "__all__",
                 "reject_models": [],
             }
@@ -212,12 +212,12 @@ class ViewsTestCase(TestCase):
     def test_hide(self):
         self.changeConfiguration(
             {
-                "allow_methods": "__all__",
+                "allow_methods": ALL_METHODS,
                 "allow_models": "__all__",
                 "reject_models": [],
                 "auth.Permission": {
                     "hidden_fields": ["codename"],
-                    "allow_methods": "__all__",
+                    "allow_methods": ALL_METHODS,
                 },
             }
         )
@@ -228,7 +228,7 @@ class ViewsTestCase(TestCase):
         response = index(request)
 
         changer = ChangeResult(
-            {"hidden_fields": ["codename"], "allow_methods": "__all__"},
+            {"hidden_fields": ["codename"], "allow_methods": ALL_METHODS},
             Permission,
             None,
         )

@@ -34,8 +34,8 @@ class Reject:
         if self.rejected_models == "__remaining__":
             self.rejected_models = set(all) - set(self.allowed_models)
 
-        if self.rejected_models == "__uneclared__":
+        if self.rejected_models == "__undeclared__":
             self.rejected_models = set(all) - set(settings.CONTEXTER_ACCESS_POLICY)
 
-        if self.allowed_models == "__uneclared__":
+        if self.allowed_models == "__undeclared__":
             self.allowed_models = set(all) - set(settings.CONTEXTER_ACCESS_POLICY)

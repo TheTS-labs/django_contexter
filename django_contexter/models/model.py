@@ -20,10 +20,16 @@ class Model(Configuration, Reject):
 
     def check_method(self, method):
         if self.props is None or self.props == {}:
-            if method not in settings.CONTEXTER_ACCESS_POLICY["allow_methods"]:
+            if (
+                method not in settings.CONTEXTER_ACCESS_POLICY["allow_methods"]
+                and settings.CONTEXTER_ACCESS_POLICY["allow_methods"] != "__any__"
+            ):
                 raise RejectError("API Method not allowed", method)
         else:
-            if method not in self.props["allow_methods"]:
+            if (
+                method not in self.props["allow_methods"]
+                and self.props["allow_methods"] != "__any__"
+            ):
                 raise RejectError("API Method not allowed for this model", method)
 
         return True
