@@ -25,17 +25,15 @@ class Reject:
 
         if self.rejected_models == "__all__":
             self.rejected_models = all
+        elif self.rejected_models == "__undeclared__":
+            self.rejected_models = set(all) - set(settings.CONTEXTER_ACCESS_POLICY)
+
         if self.allowed_models == "__all__":
             self.allowed_models = all
-
-        if self.allowed_models == "__remaining__":
-            self.allowed_models = set(all) - set(self.rejected_models)
+        elif self.allowed_models == "__undeclared__":
+            self.allowed_models = set(all) - set(settings.CONTEXTER_ACCESS_POLICY)
 
         if self.rejected_models == "__remaining__":
             self.rejected_models = set(all) - set(self.allowed_models)
-
-        if self.rejected_models == "__undeclared__":
-            self.rejected_models = set(all) - set(settings.CONTEXTER_ACCESS_POLICY)
-
-        if self.allowed_models == "__undeclared__":
-            self.allowed_models = set(all) - set(settings.CONTEXTER_ACCESS_POLICY)
+        elif self.allowed_models == "__remaining__":
+            self.allowed_models = set(all) - set(self.rejected_models)

@@ -49,6 +49,7 @@ class Model(Configuration, Reject):
         self._all_at_the_same_time()
         self._allowed_and_rejected_at_the_same_time()
         self._all_and_remaining_at_the_same_time()
+        self._both_remaining()
 
         # Warning! rejected_models are always a higher priority
 
