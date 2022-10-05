@@ -17,7 +17,7 @@ jobs:
     - name: Generate coverage report
       run: |
         poetry run poetry install
-        poetry run coverage run --branch --omit="*/test*" --source='./django_contexter/' ./example/manage.py test django_contexter
+        poetry run coverage run
         poetry run coverage xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

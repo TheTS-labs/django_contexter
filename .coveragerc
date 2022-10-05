@@ -1,0 +1,14 @@
+[run]
+branch = True
+source = ./django_contexter/
+command_line = ./example/manage.py test django_contexter
+omit =
+    */test*
+
+[html]
+directory = htmlcov
+skip_covered = True
+skip_empty = True
+
+[xml]
+output = coverage.xml
