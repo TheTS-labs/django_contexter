@@ -4,7 +4,7 @@ avoid-escape = True
 per-file-ignores =
     __init__.py:F401
     __init__.py:D104
-    django_contexter/models/views.py:WPS226 # cannot be fixed
+    django_contexter/models/views.py:WPS226
 max-line-length=120
 ignore =
     WPS305
