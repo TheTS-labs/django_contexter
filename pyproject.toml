@@ -11,6 +11,9 @@ packages = [{include = "django_contexter"}]
 python = "^3.8"
 Django = "^4.1.2"
 djangorestframework = "^3.14.0"
+yala = "^3.1.0"
+wemake-python-styleguide = "^0.17.0"
+flake8-quotes = "^3.3.1"
 
 
 [tool.poetry.group.dev.dependencies]
