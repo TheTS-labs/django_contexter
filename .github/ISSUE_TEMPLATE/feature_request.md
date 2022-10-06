@@ -1,21 +1,20 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
+title: "[FEATURE] Your feature title"
 labels: enhancement
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is.
-Ex. I'm always frustrated when [...]
+# Give a title to your request, e.g. Add function X
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+Brief description, e. g. Add a function X that does this and this
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+## Additional description(optional)
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+Describe in detail what you want to see changed and/or how, for example, in so-and-so function of so-and-so class it would be nice to add a method X that would do this and that like this
+
+## Additional context(optional)
+
+Add context to your query, such as links, posts, articles and the like
