@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from ..errors.request_error import RequestError
+from ...errors.request_error import RequestError
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_500_INTERNAL_SERVER_ERROR,
@@ -8,7 +8,7 @@ from rest_framework.status import (
 )
 
 
-class RequestErrorTestCase(TestCase):
+class RequestErrorResponseTestCase(TestCase):
     def test_default_response(self):
         err = RequestError()
         expected = Response(

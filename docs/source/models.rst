@@ -10,9 +10,9 @@ Instalation
 
    INSTALLED_APPS = [
       'rest_framework',
-      ...
+      # ...
       'django_contexter.models',
-      ...
+      # ...
    ]
 
 2. Add path in your root ``urls.py``:
@@ -20,29 +20,54 @@ Instalation
 .. code-block:: Python
 
     urlpatterns = [
-      ...
+      # ...
       path('api/models/', include("django_contexter.models.urls")),
-      ...
+      # ...
    ]
 
 Configuration
 +++++++++++++
 
-``CONTEXTER_ACCESS_POLICY`` is a pretty powerful way to set up access and here's how to use it:
+``CONTEXTER_ACCESS_POLICY``\ (``settings.py``) is a pretty powerful way to set up access and here's how to use it:
+
+Aliases
+-------
 
 .. warning::
 
-    ``__all__``, ``__remaining__`` and ``__undeclared__`` are special key words and are used as **strings**\ , not **lists**
+    Aliases are used as **strings**\ , not **lists**
+
+.. warning::
+
+    | Aliases **only** work with ``allow_models`` and ``reject_models``
+    | For methods use :ref:`QuerySet-API-method-lists`
+
+``__all__``, ``__remaining__``, ``__any__`` and ``__undeclared__`` are aliases
+
+During processing, these aliases are replaced by lists:
+
+* ``__all__`` is replaced by a list with **all** the models Django ORM knows about
+* ``__remaining__`` is replaced by all models *excluding the opposite setting*
+* ``__undeclared__`` is replaced by the list of models that are recorded extended
+* ``__any__`` specifically for allow_methods allows **any** method
 
 Global models access
 --------------------
+
+--------------------------
+The simplest configuration
+--------------------------
 
 This is an example of the simplest policy:
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__", # 1
+        "allow_methods": ALL_METHODS, # 1
         "allow_models": "__all__", # 2
         "reject_models": [] # 3
     }
@@ -53,39 +78,51 @@ This is an example of the simplest policy:
 
 3. Don't forbid **any** model(about the difference between *allow* and *reject* later)
 
-Although it's simple, it's not safe at all. What if someone wants to see the ``auth.User`` model?:
+----------------------
+"Forbid" configuration
+----------------------
+
+It's easy though, the previous configuration is not safe at all. What if someone wants to see the ``auth.User`` model?
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__", # 1
-        "allow_models": "__all__", # 2
-        "reject_models": ["auth.User"] # 3
+        "allow_methods": ALL_METHODS,
+        "allow_models": "__remaining__",
+        "reject_models": ["auth.User"]
     }
 
 Now we still allow everything,
 but because of the difference between ``reject`` and ``allow``,
 you can now access **all** models **except** ``auth.User``
 
-.. note::
-
-    It is important to note that this works because ``reject`` is considered a higher priority than ``allow``
+------------------------------
+Reverse "Forbid" configuration
+------------------------------
 
 But to declare each prohibited model is very long and difficult - yes, so we can ban all models that are not allowed:
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__", # 1
-        "allow_models": ["auth.Permission"], # 2
-        "reject_models": "__remaining__" # 3
+        "allow_methods": ALL_METHODS,
+        "allow_models": ["auth.Permission"],
+        "reject_models": "__remaining__"
     }
 
 This literally bans all models **except** those in ``allowed_models``
 
 Now we can get access **only** to the ``auth.Permission``
 
-But usually you have more than one model, so you have a choice: keywords **or** a list of models
+But usually you have more than one model, so you have a choice: aliase **or** a list of models
 
 Here's how you can:
 
@@ -93,34 +130,42 @@ Here's how you can:
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__", # 1
-        "allow_models": ["auth.Permission", "auth.User"], # 2
-        "reject_models": "__remaining__" # 3
+        "allow_methods": ALL_METHODS,
+        "allow_models": ["auth.Permission", "auth.User"],
+        "reject_models": "__remaining__"
     }
 
 2. Prohibit **only** auth.Permission *and* auth.User
 
-.. note::
-
-    This works just like ``__remaining__`` from ``reject_models`` (it works **only** because ``reject_models`` are higher priority)
-
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__", # 1
-        "allow_models": "__all__", # 2
-        "reject_models": ["auth.Permission", "auth.User"] # 3
+        "allow_methods": ALL_METHODS,
+        "allow_models": "__remaining__",
+        "reject_models": ["auth.Permission", "auth.User"]
     }
 
 3. Prohibit **only** ``auth.User`` *and* allow **only** ``auth.Permission``
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__", # 1
-        "allow_models": ["auth.User"], # 2
-        "reject_models": ["auth.Permission"] # 3
+        "allow_methods": ALL_METHODS,
+        "allow_models": ["auth.User"],
+        "reject_models": ["auth.Permission"]
     }
 
 Global methods access
@@ -128,7 +173,7 @@ Global methods access
 
 .. note::
 
-    In allow_methods, the **only** ``__all__`` keyword works
+    See :ref:`QuerySet-API-method-lists`
 
 It's certainly all very interesting.
 But what if we want to forbid certain methods,
@@ -138,8 +183,8 @@ because there are so many of them in the `QuerySet API <https://docs.djangoproje
 
     CONTEXTER_ACCESS_POLICY = {
         "allow_methods": ["all", "get"], # 1
-        "allow_models": ["auth.User"],
-        "reject_models": ["auth.Permission"] # 2
+        "allow_models": ["auth.Permission"], # 2
+        "reject_models": "__remaining__"
     }
 
 With this access policy you can:
@@ -155,9 +200,13 @@ What if we need to allow ``.get(**model_request)`` and ``.all()`` methods for ``
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__", # 1
-        "allow_models": "__all__", # 2
+        "allow_methods": ALL_METHODS, # 1
+        "allow_models": "__remaining__", # 2
         "reject_models": "__undeclared__", # 3
 
         "auth.User": { # recorded extended
@@ -192,9 +241,13 @@ Hide fields
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__",
-        "allow_models": "__all__",
+        "allow_methods": ALL_METHODS,
+        "allow_models": "__remaining__",
         "reject_models": "__undeclared__",
 
         "auth.User": { # recorded extended
@@ -214,9 +267,13 @@ Let's try to hide ``codename`` from ``auth.Permission``:
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__",
-        "allow_models": "__all__",
+        "allow_methods": ALL_METHODS,
+        "allow_models": "__remaining__",
         "reject_models": "__undeclared__",
 
         "auth.User": { # recorded extended
@@ -245,9 +302,13 @@ This works for several fields as well:
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__",
-        "allow_models": "__all__",
+        "allow_methods": ALL_METHODS,
+        "allow_models": "__remaining__",
         "reject_models": "__undeclared__",
 
         "auth.User": { # recorded extended
@@ -285,6 +346,10 @@ We're reaching a new level of customizability:
 
 .. code-block:: Python
 
+    from django_contexter.models.method_types import ALL_METHODS
+
+    # ...
+
     def custom_hide(full_result, model, props, field, request):
         print(full_result)
         print(model)
@@ -295,8 +360,8 @@ We're reaching a new level of customizability:
         return "CUSTOM_HIDED"
 
     CONTEXTER_ACCESS_POLICY = {
-        "allow_methods": "__all__",
-        "allow_models": "__all__",
+        "allow_methods": ALL_METHODS,
+        "allow_models": "__remaining__",
         "reject_models": "__undeclared__",
 
         "auth.User": { # recorded extended
@@ -342,58 +407,52 @@ As you can see, your method is called with the parameters ``full_result``, ``mod
 
 And you can return any **text** - it will replace the field value
 
+.. _QuerySet-API-method-lists:
+
 QuerySet API method lists
 -------------------------
 
-First of all, perform the import:
-
-.. code-block:: Python
-
-    from django_contexter.models.method_types import *
-
-Lists:
-
-.. option:: METHODS_THAT_RENTURN_NEW_QUERYSET
+.. option:: django_contexter.models.method_types.METHODS_THAT_RENTURN_NEW_QUERYSET
 
    :description: Django provides a range of QuerySet refinement methods that modify either the types of results returned by the QuerySet or the way its SQL query is executed
 
    :link: `#methods-that-return-new-querysets <https://docs.djangoproject.com/en/4.1/ref/models/querysets/#methods-that-return-new-querysets>`_
 
-.. option:: METHODS_THAT_DO_NOT_RETURN_QUERYSET
+.. option:: django_contexter.models.method_types.METHODS_THAT_DO_NOT_RETURN_QUERYSET
 
    :description: The following QuerySet methods evaluate the QuerySet and return something other than a QuerySet
 
    :link: `#methods-that-do-not-return-querysets <https://docs.djangoproject.com/en/4.1/ref/models/querysets/#methods-that-do-not-return-querysets>`_
 
-.. option:: METHODS_THAT_CHAGES_RECORDS
+.. option:: django_contexter.models.method_types.METHODS_THAT_CHAGES_RECORDS
 
    :description: Methods for changing the database
 
-.. option:: ASYNC_METHODS_THAT_DO_NOT_RETURN_QUERYSET
+.. option:: django_contexter.models.method_types.ASYNC_METHODS_THAT_DO_NOT_RETURN_QUERYSET
 
    :description: Same as ``METHODS_THAT_DO_NOT_RETURN_QUERYSET`` - asynchronous method variations
 
-.. option:: ASYNC_METHODS_THAT_CHAGES_RECORDS
+.. option:: django_contexter.models.method_types.ASYNC_METHODS_THAT_CHAGES_RECORDS
 
    :description: Same as ``METHODS_THAT_CHAGES_RECORDS`` - asynchronous method variations
 
-.. option:: UNSAFE_METHODS
+.. option:: django_contexter.models.method_types.UNSAFE_METHODS
 
    :description: Alias for ``METHODS_THAT_CHAGES_RECORDS``
 
-.. option:: ASYNC_UNSAFE_METHODS
+.. option:: django_contexter.models.method_types.ASYNC_UNSAFE_METHODS
 
    :description: Alias for ``ASYNC_METHODS_THAT_CHAGES_RECORDS``
 
-.. option:: ALL_UNSAFE_METHODS
+.. option:: django_contexter.models.method_types.ALL_UNSAFE_METHODS
 
    :description: ``ASYNC_METHODS_THAT_CHAGES_RECORDS`` and ``METHODS_THAT_CHAGES_RECORDS``
 
-.. option:: ALL_METHODS
+.. option:: django_contexter.models.method_types.ALL_METHODS
 
    :description: All QuerySet API methods
 
-.. option:: ALL_SAFE_METHODS
+.. option:: django_contexter.models.method_types.ALL_SAFE_METHODS
 
    :description: ``ALL_METHODS`` without ``ALL_UNSAFE_METHODS``
 

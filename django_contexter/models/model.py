@@ -22,13 +22,13 @@ class Model(Configuration, Reject):
         if self.props is None or self.props == {}:
             if (
                 method not in settings.CONTEXTER_ACCESS_POLICY["allow_methods"]
-                and settings.CONTEXTER_ACCESS_POLICY["allow_methods"] != "__all__"
+                and settings.CONTEXTER_ACCESS_POLICY["allow_methods"] != "__any__"
             ):
                 raise RejectError("API Method not allowed", method)
         else:
             if (
                 method not in self.props["allow_methods"]
-                and self.props["allow_methods"] != "__all__"
+                and self.props["allow_methods"] != "__any__"
             ):
                 raise RejectError("API Method not allowed for this model", method)
 
@@ -49,12 +49,11 @@ class Model(Configuration, Reject):
         self._all_at_the_same_time()
         self._allowed_and_rejected_at_the_same_time()
         self._all_and_remaining_at_the_same_time()
+        self._both_remaining()
 
         # Warning! rejected_models are always a higher priority
 
         self._model_rejected()
-        self._remaining_and_not_allowed()
-        self._undeclared()
 
     @property
     def model(self):

@@ -4,6 +4,7 @@ from django_contexter.models.errors.configuration_error import ConfigurationErro
 
 
 class Configuration:
+    # TODO: Use own __init__
     def _all_at_the_same_time(self):
         if self.allowed_models == "__all__" and self.rejected_models == "__all__":
             raise ConfigurationError(
@@ -30,5 +31,16 @@ class Configuration:
             )
 
     def _all_and_remaining_at_the_same_time(self):
-        if self.allowed_models == "__all__" and self.rejected_models == "__remaining__":
+        if (
+            self.allowed_models == "__all__" and self.rejected_models == "__remaining__"
+        ) or (
+            self.rejected_models == "__all__" and self.allowed_models == "__remaining__"
+        ):
             raise ConfigurationError("Using __all__ with __remaining__ will not work")
+
+    def _both_remaining(self):
+        if (
+            self.allowed_models == "__remaining__"
+            and self.rejected_models == "__remaining__"
+        ):
+            raise ConfigurationError("Using both __remaining__ will not work")
