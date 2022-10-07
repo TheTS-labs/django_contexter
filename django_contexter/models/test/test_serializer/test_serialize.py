@@ -1,11 +1,15 @@
+"""Test dynamic serializer."""
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from ...serializer import Serializer
+from django_contexter.models.serializer import Serializer
 
 
 class SerializerTestCase(TestCase):
-    def setUp(self):
+    """Test dynamic serializer."""
+
+    def setUp(self):  # noqa: D102
         self.user_attributes = {
             "username": "john",
             "email": "lennon@thebeatles.com",
@@ -14,12 +18,13 @@ class SerializerTestCase(TestCase):
 
         self.user_serialized = {"username": "john", "email": "lennon@thebeatles.com"}
 
+    def test_serializer(self):
+        """Test work of dynamic serializer."""
         self.user = User.objects.create_user(**self.user_attributes)
+
         self.serializer = Serializer(
             self.user,
             context={"model": User, "fields": ["username", "email"]},
         )
 
-    def test_serializer(self):
-        """Test work of custom serializer"""
         self.assertEqual(self.serializer.data, self.user_serialized)
