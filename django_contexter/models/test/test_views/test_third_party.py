@@ -34,11 +34,11 @@ class ThirdPartyTestCase(TestCase):
             ],
         ]
 
-        for index, test_case in enumerate(test_cases):
-            function = test_case[index][0]
-            self.assertEqual(function().data["err_msg"], test_case[index][1])
-            self.assertEqual(function().data["err_code"], test_case[index][2])
-            self.assertEqual(function().status_code, test_case[index][3])
+        for test_case in test_cases:
+            function = test_case[0]
+            self.assertEqual(function().data["err_msg"], test_case[1])
+            self.assertEqual(function().data["err_code"], test_case[2])
+            self.assertEqual(function().status_code, test_case[3])
 
     def test_exclude_keys(self):
         """Test esclude_keys function."""
