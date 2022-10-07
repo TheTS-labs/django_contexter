@@ -16,7 +16,7 @@ from django_contexter.models.errors.err_codes import (
 )
 from django_contexter.models.errors.reject_error import RejectError
 from django_contexter.models.errors.request_error import RequestError
-from django_contexter.models.model import Model
+from django_contexter.models.model import GetModel
 from django_contexter.models.serializer import Serializer
 
 
@@ -92,7 +92,7 @@ def index(request):
     """
     _check_modelname_in_request(request.GET)
 
-    model = Model(request.GET.get("modelName"))
+    model = GetModel(request.GET.get("modelName"))
     changer = ChangeResult(model.props, model.model, request)
 
     request_result = model.model.objects
