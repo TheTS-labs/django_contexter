@@ -1,9 +1,22 @@
 from django_contexter.models.method_types import ALL_METHODS, ALL_SAFE_METHODS
 
+# ? Why need noqa: WPS226?
+# * These are different variations of
+# * the configuration whose string
+# * literals cannot be fixed
 
-class Config_errors_Configs:
+
+class ConfigErrorsConfigs(object):
+    """Configs for ModelConfigTestCase."""
+
     @property
     def configs(self):
+        """
+        Configs for ModelConfigTestCase.
+
+        Returns:
+            dict: Configs
+        """
         return {
             "test_both_all": {
                 "allow_methods": ALL_METHODS,
@@ -17,7 +30,7 @@ class Config_errors_Configs:
                 # ? The message about the rejected request will be earlier than the configuration error.
                 # * Make sure you are using an allowed model.
                 # * This is quite expected behavior and is not an error,
-                #! but only for this type of error
+                # ! but only for this type of error
             },
             "test_all_and_remaining": {
                 "allow_methods": ALL_METHODS,
@@ -33,9 +46,17 @@ class Config_errors_Configs:
         }
 
 
-class Just_Configs:
+class JustConfigs(object):
+    """Configs for ConfigsTestCase."""
+
     @property
     def configs(self):
+        """
+        Configs for ConfigsTestCase.
+
+        Returns:
+            dict: Configs
+        """
         return {
             "test_allow": {
                 "allow_methods": ALL_METHODS,
@@ -78,9 +99,17 @@ class Just_Configs:
         }
 
 
-class Methods_Configs:
+class MethodsConfigs(object):
+    """Configs for MethodsTestCase."""
+
     @property
     def configs(self):
+        """
+        Configs for MethodsTestCase.
+
+        Returns:
+            dict: Configs
+        """
         return {
             "test_local_reject_method": {
                 "allow_methods": [],
@@ -95,19 +124,4 @@ class Methods_Configs:
                 "allow_models": "__all__",
                 "reject_models": [],
             },
-            # "test_any": {
-            #     "allow_methods": "__any__",
-            #     "allow_models": "__all__",
-            #     "reject_models": [],
-            # }
-        }
-
-
-class Errors_Config:
-    @staticmethod
-    def config():
-        return {
-            "allow_methods": ALL_SAFE_METHODS,
-            "allow_models": ["model_NotExists", "model.NotExists"],
-            "reject_models": [],
         }

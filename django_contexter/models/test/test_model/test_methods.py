@@ -1,53 +1,44 @@
-from django.conf import settings
-from django.contrib.auth.models import Permission, User
+"""Test the compliance of the method Access Policy."""
+
 from django.test import TestCase
 
-from django_contexter.models.errors.request_error import RequestError
-from django_contexter.models.method_types import (
-    ALL_METHODS,
-    ALL_SAFE_METHODS,
-    ALL_UNSAFE_METHODS,
-)
-from django_contexter.models.test.test_model.configs import Methods_Configs
+from django_contexter.models.errors.reject_error import RejectError
+from django_contexter.models.method_types import ALL_METHODS, ALL_SAFE_METHODS, ALL_UNSAFE_METHODS
+from django_contexter.models.model import GetModel
+from django_contexter.models.test.test_model.configs import MethodsConfigs
 
-from ...errors.configuration_error import ConfigurationError
-from ...errors.reject_error import RejectError
-from ...model import Model
+# ? Why need noqa: WPS440?
+# * method isn't overlapped
+# * These local variable used in it own for loop
 
 
-class ModelTestCase(TestCase, Methods_Configs):
-    def test_local_reject_method(self):
+class MethodsTestCase(TestCase, MethodsConfigs):
+    """Test the compliance of the method Access Policy."""
+
+    def test_local_access_method(self):
+        """Check whether the method complies with the Access Policy for the local configuration."""
         with self.settings(
-            CONTEXTER_ACCESS_POLICY=self.configs["test_local_reject_method"]
+            CONTEXTER_ACCESS_POLICY=self.configs["test_local_reject_method"],
         ):
-            model = Model("auth.Permission")
-
-            for method in ALL_METHODS - ALL_SAFE_METHODS:
-                with self.assertRaises(RejectError):
-                    model.check_method(method)
-
-            with self.assertRaises(RejectError):
-                model.check_method("Method Not Exist")
-
-            for method in ALL_METHODS - ALL_UNSAFE_METHODS:
-                self.assertEqual(model.check_method(method), True)
-
-    def test_global_reject_method(self):
-        with self.settings(
-            CONTEXTER_ACCESS_POLICY=self.configs["test_global_reject_method"]
-        ):
-            model = Model("auth.Permission")
+            model = GetModel("auth.Permission")
 
             for method in ALL_METHODS - ALL_SAFE_METHODS:
                 with self.assertRaises(RejectError):
                     model.check_method(method)
 
             for method in ALL_METHODS - ALL_UNSAFE_METHODS:
-                self.assertEqual(model.check_method(method), True)
+                self.assertTrue(model.check_method(method))
 
-    # def test_any(self):
-    #     with self.settings(CONTEXTER_ACCESS_POLICY=self.configs["test_any"]):
-    #         model = Model("auth.Permission")
+    def test_global_access_method(self):
+        """Check whether the method complies with the Access Policy for the global configuration."""
+        with self.settings(
+            CONTEXTER_ACCESS_POLICY=self.configs["test_global_reject_method"],
+        ):
+            model = GetModel("auth.Permission")
 
-    #         with self.assertRaises(RequestError):
-    #             model.check_method("Method Not Exist")
+            for method in ALL_METHODS - ALL_SAFE_METHODS:
+                with self.assertRaises(RejectError):
+                    model.check_method(method)
+
+            for method in ALL_METHODS - ALL_UNSAFE_METHODS:
+                self.assertTrue(model.check_method(method))
