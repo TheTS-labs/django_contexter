@@ -1,18 +1,18 @@
-from operator import attrgetter
-
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
-from ...change_result import ChangeResult
-from ...errors.reject_error import RejectError
-from ...method_types import ALL_METHODS, ALL_SAFE_METHODS, ALL_UNSAFE_METHODS
+from django_contexter.models.change_result import ChangeResult
 
 
 class ChangeResultConfigTestCase(TestCase):
+    """Sus? Test Configs."""
+
     def test_no_changes_empty_dict(self):
+        """Except no changes in records with empty dict config."""
         changer = ChangeResult({}, Permission, None)
         self.assertEqual(changer.fix_fields(Permission.objects), Permission.objects)
 
-    def test_no_changes_None(self):
+    def test_no_changes_none(self):
+        """Except no changes in records with None config."""
         changer = ChangeResult(None, Permission, None)
         self.assertEqual(changer.fix_fields(Permission.objects), Permission.objects)

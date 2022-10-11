@@ -3,16 +3,30 @@ from operator import attrgetter
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
-from ...change_result import ChangeResult
-from ...errors.reject_error import RejectError
-from ...method_types import ALL_METHODS, ALL_SAFE_METHODS, ALL_UNSAFE_METHODS
+from django_contexter.models.change_result import ChangeResult
+from django_contexter.models.method_types import ALL_SAFE_METHODS
+
+# ? Why need noqa: WPS437?
+# * Because Django doesn't forbid the use of _meta
+# https://docs.djangoproject.com/en/4.1/ref/models/meta/
+
+
+def _to_be_hided(full_result, model, props, field, request):
+    return "HIDED"
+
+
+empty = frozenset()
+simple_hide = "SIMPLE_HIDE"
+standart_hide = ["codename"]
 
 
 class ChangeResultTestCase(TestCase):
+    """Test result changing(hiding)."""
+
     def test_hide_one(self):
-        hide = ["codename"]
+        """Easy Level: Hide only one field."""
         changer = ChangeResult(
-            {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": hide},
+            {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": standart_hide},
             Permission,
             None,
         )
@@ -20,20 +34,22 @@ class ChangeResultTestCase(TestCase):
         records = Permission.objects
         fixed_fields = changer.fix_fields(records.all().first())
 
-        fields_list = [field.name for field in Permission._meta.fields]
-        del fields_list[fields_list.index(hide[0])]
-
-        self.assertNotEqual(fixed_fields.codename, records.first().codename)
-        self.assertEqual(fixed_fields.codename, "*" * len(hide[0]))
-        self.assertEqual(
-            attrgetter(*fields_list)(fixed_fields),
-            attrgetter(*fields_list)(records.first()),
+        self._check_hided_attrs(
+            standart_hide,
+            records.all().first(),
+            fixed_fields,
+            codename=simple_hide,
+        )
+        self._check_other_attrs(
+            self._get_fileld_names_list(Permission, standart_hide),
+            fixed_fields,
+            records.first(),
         )
 
     def test_hide_many(self):
-        hide = ["codename"]
+        """Intermediate Level: Hide only one field in many records."""
         changer = ChangeResult(
-            {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": hide},
+            {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": standart_hide},
             Permission,
             None,
         )
@@ -41,19 +57,22 @@ class ChangeResultTestCase(TestCase):
         records = Permission.objects
         fixed_fields = changer.fix_fields(records.all())
 
-        fields_list = [field.name for field in Permission._meta.fields]
-        del fields_list[fields_list.index(hide[0])]
-
-        for i, record in enumerate(records.all()):
-            self.assertNotEqual(fixed_fields[i].codename, record.codename)
-            self.assertEqual(fixed_fields[i].codename, "*" * len(hide[0]))
-            self.assertEqual(
-                attrgetter(*fields_list)(fixed_fields[i]),
-                attrgetter(*fields_list)(record),
+        for fixed_field, record in zip(fixed_fields, records.all()):
+            self._check_hided_attrs(
+                standart_hide,
+                record,
+                fixed_field,
+                codename=simple_hide,
+            )
+            self._check_other_attrs(
+                self._get_fileld_names_list(Permission, standart_hide),
+                fixed_field,
+                record,
             )
 
     def test_multiple_hide(self):
-        hide = ["codename", "name"]
+        """Intermediate++ Level: Hide many fields."""
+        hide = standart_hide + ["name"]
         changer = ChangeResult(
             {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": hide},
             Permission,
@@ -63,25 +82,23 @@ class ChangeResultTestCase(TestCase):
         records = Permission.objects
         fixed_fields = changer.fix_fields(records.all().first())
 
-        fields_list = [field.name for field in Permission._meta.fields]
-        del fields_list[fields_list.index(hide[0])]
-        del fields_list[fields_list.index(hide[1])]
-
-        self.assertNotEqual(fixed_fields.codename, records.first().codename)
-        self.assertNotEqual(fixed_fields.name, records.first().name)
-        self.assertEqual(fixed_fields.codename, "*" * len(hide[0]))
-        self.assertEqual(fixed_fields.name, "*" * len(hide[1]))
-        self.assertEqual(
-            attrgetter(*fields_list)(fixed_fields),
-            attrgetter(*fields_list)(records.first()),
+        self._check_hided_attrs(
+            hide,
+            records.all().first(),
+            fixed_fields,
+            codename=simple_hide,
+            name=simple_hide,
+        )
+        self._check_other_attrs(
+            self._get_fileld_names_list(Permission, hide),
+            fixed_fields,
+            records.first(),
         )
 
     def test_custom_hide(self):
-        def hide(full_result, model, props, field, request):
-            return "HIDED"
-
+        """Hard Level: Use custom hide function."""
         changer = ChangeResult(
-            {"allow_methods": ALL_SAFE_METHODS, "codename": hide, "hidden_fields": []},
+            {"allow_methods": ALL_SAFE_METHODS, "codename": _to_be_hided, "hidden_fields": []},
             Permission,
             None,
         )
@@ -89,11 +106,36 @@ class ChangeResultTestCase(TestCase):
         records = Permission.objects
         fixed_fields = changer.fix_fields(records.all().first())
 
-        fields_list = [field.name for field in Permission._meta.fields]
-        del fields_list[fields_list.index("codename")]
-
-        self.assertEqual(fixed_fields.codename, "HIDED")
-        self.assertEqual(
-            attrgetter(*fields_list)(fixed_fields),
-            attrgetter(*fields_list)(records.first()),
+        self._check_hided_attrs(
+            standart_hide,
+            records.all().first(),
+            fixed_fields,
+            codename="HIDED",
         )
+        self._check_other_attrs(
+            self._get_fileld_names_list(Permission, standart_hide),
+            fixed_fields,
+            records.first(),
+        )
+
+    def _get_fileld_names_list(self, model_instance, except_fields=empty):
+        field_names = [field.name for field in model_instance._meta.fields]
+
+        for element in sorted(except_fields, reverse=True):
+            field_names.remove(element)
+
+        return field_names
+
+    def _check_other_attrs(self, attrs, proper_attrs, testing_attrs):
+        self.assertEqual(
+            attrgetter(*attrs)(testing_attrs),
+            attrgetter(*attrs)(proper_attrs),
+        )
+
+    def _check_hided_attrs(self, hide_attrs, initial_queryset, testing_queryset, **kwargs):
+        for attr in hide_attrs:
+            self.assertNotEqual(getattr(initial_queryset, attr), getattr(testing_queryset, attr))
+            if kwargs.get(attr) == simple_hide:
+                self.assertEqual(getattr(testing_queryset, attr), "*" * len(attr))
+            else:
+                self.assertEqual(getattr(testing_queryset, attr), kwargs.get(attr))
