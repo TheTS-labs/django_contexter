@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from django_contexter.models.errors.reject_error import RejectError
-from django_contexter.models.model import GetModel
+from django_contexter.models.get_model import GetModel
 from django_contexter.models.test.test_model.configs import JustConfigs
 
 # ? Why need noqa: WPS437?

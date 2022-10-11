@@ -16,7 +16,7 @@ from django_contexter.models.errors.err_codes import (
 )
 from django_contexter.models.errors.reject_error import RejectError
 from django_contexter.models.errors.request_error import RequestError
-from django_contexter.models.model import GetModel
+from django_contexter.models.get_model import GetModel
 from django_contexter.models.serializer import Serializer
 
 

@@ -2,7 +2,7 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from django_contexter.models.errors.configuration_error import ConfigurationError
-from django_contexter.models.model import GetModel
+from django_contexter.models.get_model import GetModel
 from django_contexter.models.test.test_model.configs import ConfigErrorsConfigs
 
 
