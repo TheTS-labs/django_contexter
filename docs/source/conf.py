@@ -9,7 +9,7 @@
 PROJECT = "Friendly Contexter"
 COPYRIGHT = "2022, Roman"
 AUTHOR = "Roman"
-REELASE = "0.5.0"
+REELASE = "0.5.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
