@@ -1,4 +1,4 @@
-"""Declares all err_codes"""
+"""Declare all err_codes."""
 
 NO_MANDATORY_PARAMETER_MODELNAME = 0
 MODEL_DOES_NOT_EXIST = 1
