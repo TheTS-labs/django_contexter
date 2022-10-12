@@ -5,7 +5,7 @@ from django.test import TestCase
 from django_contexter.models.errors.reject_error import RejectError
 from django_contexter.models.method_types import ALL_METHODS, ALL_SAFE_METHODS, ALL_UNSAFE_METHODS
 from django_contexter.models.get_model import GetModel
-from django_contexter.models.test.test_model.configs import MethodsConfigs
+from django_contexter.models.test.test_get_model.configs import MethodsConfigs
 
 # ? Why need noqa: WPS440?
 # * method isn't overlapped

@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from django_contexter.models.errors.configuration_error import ConfigurationError
 from django_contexter.models.get_model import GetModel
-from django_contexter.models.test.test_model.configs import ConfigErrorsConfigs
+from django_contexter.models.test.test_get_model.configs import ConfigErrorsConfigs
 
 
 class ModelConfigTestCase(TestCase, ConfigErrorsConfigs):

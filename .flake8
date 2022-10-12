@@ -3,9 +3,9 @@ inline-quotes = double
 avoid-escape = True
 per-file-ignores =
     __init__.py:F401,D104
-    django_contexter/models/test/test_model/test_configs.py:WPS437
-    django_contexter/models/test/test_model/test_methods.py:WPS440
-    django_contexter/models/test/test_model/configs.py:WPS226
+    django_contexter/models/test/test_get_model/test_configs.py:WPS437
+    django_contexter/models/test/test_get_model/test_methods.py:WPS440
+    django_contexter/models/test/test_get_model/configs.py:WPS226
     django_contexter/models/test/change_result/test_hiding.py:WPS437
     django_contexter/models/part_of/get_model/reject.py:WPS437
 max-string-usages=4
@@ -14,9 +14,10 @@ ignore =
     WPS305
     D100
 exclude =
-    .git,
-    __pycache__,
-    docs/source/conf.py,
-    build,
+    .git
+    __pycache__
+    docs/source/conf.py
+    build
     ./example/**/*
+    ./example/manage.py
 docstring-quotes = """
