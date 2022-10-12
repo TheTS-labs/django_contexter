@@ -106,9 +106,9 @@ def index(request):
         model.check_method(model_request["function_name"])
 
         try:
-            model_request.update(
-                {"function": getattr(request_result, model_request["function_name"])}
-            )
+            model_request.update({
+                "function": getattr(request_result, model_request["function_name"]),
+            })
         except AttributeError as exc:
             raise RequestError(
                 f"No function named '{model_request['function_name']}' in QuerySet API",

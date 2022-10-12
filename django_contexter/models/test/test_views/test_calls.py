@@ -24,12 +24,11 @@ class CallsTestCase(TestCase, Configs):
 
     def test_call_with_model_name(self):
         """Test call with modelName, expect all records."""
-        with self.settings(
-            CONTEXTER_ACCESS_POLICY=self.configs["test_call_with_modelName"],
-        ):
-            response = self._get_response(
-                "".join(["/api/models/", "?modelName=auth.Permission"]),
-            )
+        with self.settings(CONTEXTER_ACCESS_POLICY=self.configs["test_call_with_modelName"]):
+            response = self._get_response("".join([
+                "/api/models/",
+                "?modelName=auth.Permission",
+            ]))
             model_objects = Permission.objects
             serialized = Serializer(
                 model_objects, many=True, context={"model": Permission, "fields": "__all__"},
@@ -41,9 +40,11 @@ class CallsTestCase(TestCase, Configs):
     def test_all_call(self):
         """Test "all" call, expect all records."""
         with self.settings(CONTEXTER_ACCESS_POLICY=self.configs["test_all_call"]):
-            response = self._get_response(
-                "".join(["/api/models/", "?modelName=auth.Permission", "&all"]),
-            )
+            response = self._get_response("".join([
+                "/api/models/",
+                "?modelName=auth.Permission",
+                "&all",
+            ]))
             model_objects = Permission.objects.all()
             serialized = Serializer(
                 model_objects, many=True, context={"model": Permission, "fields": "__all__"},
@@ -55,19 +56,15 @@ class CallsTestCase(TestCase, Configs):
     def test_get_call(self):
         """Test "get" call, expect ONLY ONE records."""
         with self.settings(CONTEXTER_ACCESS_POLICY=self.configs["test_get_call"]):
-            response = self._get_response(
-                "".join(
-                    [
-                        "/api/models/",
-                        "?modelName=auth.Permission",
-                        "&all",
-                        '&get={"pk": 1}',
-                    ]
-                )
-            )
+            response = self._get_response("".join([
+                "/api/models/",
+                "?modelName=auth.Permission",
+                "&all",
+                '&get={"pk": 1}',
+            ]))
             model_objects = Permission.objects.all().get(pk=1)
             serialized = Serializer(
-                model_objects, many=False, context={"model": Permission, "fields": "__all__"}
+                model_objects, many=False, context={"model": Permission, "fields": "__all__"},
             )
 
             self.assertEqual(response.status_code, status.HTTP_200_OK)
