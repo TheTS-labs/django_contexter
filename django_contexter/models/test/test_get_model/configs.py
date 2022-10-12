@@ -37,6 +37,11 @@ class ConfigErrorsConfigs(object):
                 "allow_models": "__all__",
                 "reject_models": "__remaining__",
             },
+            "test_remaining_and_all": {
+                "allow_methods": ALL_METHODS,
+                "allow_models": "__remaining__",
+                "reject_models": "__all__",
+            },
             "test_both_remaining": {
                 "allow_methods": ALL_METHODS,
                 "allow_models": "__remaining__",
@@ -123,5 +128,13 @@ class MethodsConfigs(object):
                 "allow_methods": ALL_SAFE_METHODS,
                 "allow_models": "__all__",
                 "reject_models": [],
+            },
+            "test_local_any": {
+                "allow_methods": [],
+                "allow_models": "__remaining__",
+                "reject_models": "__undeclared__",
+                "auth.Permission": {
+                    "allow_methods": "__any__",
+                },
             },
         }
