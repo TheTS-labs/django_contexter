@@ -1,61 +1,57 @@
-from django.conf import settings
-from django.test import RequestFactory, TestCase
-from django_contexter.models.change_result import ChangeResult
+"""Test third-party functions of views.py."""
+from django.test import TestCase
 
-from django_contexter.models.method_types import ALL_METHODS, ALL_SAFE_METHODS
-
-from ...errors.err_codes import (
-    FIELD_ERROR,
-    FUNCTION_DOES_NOT_EXIST_IN_QUERYSET_API,
-    NO_MANDATORY_PARAMETER_MODELNAME,
-    REJECT_ERROR,
-    SERVER_WRONG_CONFIG,
-)
-
-from ...errors.request_error import RequestError
-from ...views import Error_Handler, exclude_keys, index
-
-from ...errors.configuration_error import ConfigurationError
-
-from ...errors.reject_error import RejectError
-
-from django.contrib.auth.models import Permission
-from ...serializer import Serializer
+from django_contexter.models.errors.configuration_error import ConfigurationError
+from django_contexter.models.errors.err_codes import REJECT_ERROR, SERVER_WRONG_CONFIG
+from django_contexter.models.errors.reject_error import RejectError
+from django_contexter.models.errors.request_error import RequestError
+from django_contexter.models.views import error_handler, exclude_keys
 
 
 class ThirdPartyTestCase(TestCase):
+    """Test third-party functions of views.py."""
+
     def test_error_handler_decorator(self):
-        def to_be_decorated_reject():
-            raise RejectError()
-
-        def to_be_decorated_config():
-            raise ConfigurationError("Test message")
-
-        def to_be_decorated_request():
-            raise RequestError()
-
-        decorators = [
-            Error_Handler(to_be_decorated_reject),
-            Error_Handler(to_be_decorated_config),
-            Error_Handler(to_be_decorated_request),
+        """Test error handler decorator."""
+        test_cases = [
+            [
+                error_handler(self._to_be_decorated_reject),
+                "Request was rejected(Unknown Model). Reason: Unknown Reason",
+                REJECT_ERROR,
+                403,
+            ],
+            [
+                error_handler(self._to_be_decorated_config),
+                "Test message",
+                SERVER_WRONG_CONFIG,
+                500,
+            ],
+            [
+                error_handler(self._to_be_decorated_request),
+                "Unknown Error",
+                -1,
+                500,
+            ],
         ]
-        messages = [
-            "Request was rejected(Unknown Model). Reason: Unknown Reason",
-            "Test message",
-            "Unknown Error",
-        ]
-        codes = [REJECT_ERROR, SERVER_WRONG_CONFIG, -1]
-        statuses = [403, 500, 500]
 
-        for decorator, message, code, status in zip(
-            decorators, messages, codes, statuses
-        ):
-            self.assertEqual(decorator().data["err_msg"], message)
-            self.assertEqual(decorator().data["err_code"], code)
-            self.assertEqual(decorator().status_code, status)
+        for test_case in test_cases:
+            function = test_case[0]
+            self.assertEqual(function().data["err_msg"], test_case[1])
+            self.assertEqual(function().data["err_code"], test_case[2])
+            self.assertEqual(function().status_code, test_case[3])
 
     def test_exclude_keys(self):
+        """Test esclude_keys function."""
         full = {"1": 1, "2": 2, "3": 3}
         expected = {"1": 1, "3": 3}
 
         self.assertEqual(expected, exclude_keys(full, ["2"]))
+
+    def _to_be_decorated_reject(self):
+        raise RejectError()
+
+    def _to_be_decorated_config(self):
+        raise ConfigurationError("Test message")
+
+    def _to_be_decorated_request(self):
+        raise RequestError()

@@ -5,7 +5,15 @@ from django_contexter.models.errors.request_error import RequestError
 
 
 class ConfigurationError(RequestError):
+    """Exception raised if configuration wrong."""
+
     def __init__(self, message):
+        """
+        Save message of error.
+
+        Args:
+            message: Error message
+        """
         self.err_code = SERVER_WRONG_CONFIG
         self.message = message
         self.status = HTTP_500_INTERNAL_SERVER_ERROR

@@ -13,16 +13,16 @@ repos:
       - id: end-of-file-fixer
       - id: name-tests-test
       - id: trailing-whitespace
--   repo: https://github.com/psf/black
-    rev: 22.8.0
-    hooks:
-    -   id: black
+# -   repo: https://github.com/psf/black
+#     rev: 22.8.0
+#     hooks:
+#     -   id: black
 -   repo: https://github.com/jumanjihouse/pre-commit-hooks
     rev: 3.0.0
     hooks:
     -   id: forbid-binary
     -   id: git-dirty
-    -   id: markdownlint
+    # -   id: markdownlint
     -   id: script-must-have-extension
 -   repo: https://github.com/Lucas-C/pre-commit-hooks-safety
     rev: v1.3.0

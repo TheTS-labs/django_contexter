@@ -1,10 +1,6 @@
 name: Code quality CI
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: pull_request
 
 jobs:
   black:
@@ -17,10 +13,9 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install Poetry
-      run: pip install poetry
-
-    - name: Check code quality
-      run: |
-        poetry run poetry install
-        poetry run black ./django_contexter/ --check
+    - name: wemake-python-styleguide
+      uses: wemake-services/wemake-python-styleguide
+      with:
+        reporter: 'github-pr-check'
+      env:
+        GITHUB_TOKEN: ${{ secrets.github_token }}
