@@ -3,13 +3,13 @@
 from django.contrib.auth.models import Permission
 from django.test import RequestFactory, TestCase
 from rest_framework import status
+from django_contexter.models import views
 
 from django_contexter.models.change_result import ChangeResult
 from django_contexter.models.errors.err_codes import FIELD_ERROR, FUNCTION_DOES_NOT_EXIST_IN_QUERYSET_API, REJECT_ERROR
 from django_contexter.models.method_types import ALL_METHODS, ALL_SAFE_METHODS
 from django_contexter.models.serializer import Serializer
 from django_contexter.models.test.test_views.configs import Configs
-from django_contexter.models.views import index
 
 
 class MainTestCase(TestCase, Configs):
@@ -83,4 +83,4 @@ class MainTestCase(TestCase, Configs):
     def _get_response(self, path):
         request = self.factory.get(path)
 
-        return index(request)
+        return views.Index.as_view()(request)

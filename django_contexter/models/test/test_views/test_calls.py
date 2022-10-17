@@ -3,11 +3,12 @@
 from django.contrib.auth.models import Permission
 from django.test import RequestFactory, TestCase
 from rest_framework import status
+from django_contexter.models import views
 
 from django_contexter.models.errors.err_codes import NO_MANDATORY_PARAMETER_MODELNAME
 from django_contexter.models.serializer import Serializer
 from django_contexter.models.test.test_views.configs import Configs
-from django_contexter.models.views import index
+from django_contexter.models.views import Index
 
 
 class CallsTestCase(TestCase, Configs):
@@ -73,4 +74,4 @@ class CallsTestCase(TestCase, Configs):
     def _get_response(self, path):
         request = self.factory.get(path)
 
-        return index(request)
+        return views.Index.as_view()(request)
