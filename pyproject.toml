@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-contexter"
-version = "0.5.1"
+version = "0.5.2"
 description = "Getting data from Django's backend with REST API"
 authors = ["Roman <romantovt31@gmail.com>"]
 license = "GNU GPL-3.0"
