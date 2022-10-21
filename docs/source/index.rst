@@ -5,9 +5,9 @@ Welcome to Django Contexter's documentation!
 
    This project is under active development
 
-.. note::
+.. warning::
 
-   Last updated at October 4 2022
+   Like Django context this API does not allow to change data (e.g. in a database)
 
 Get data from Django's backend with REST API
 
@@ -38,3 +38,5 @@ Contents
 .. toctree::
 
    models
+
+   migration_guides

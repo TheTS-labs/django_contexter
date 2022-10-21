@@ -211,12 +211,12 @@ What if we need to allow ``.get(**model_request)`` and ``.all()`` methods for ``
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"], # 4
-            "hidden_fields": [] # We will consider this later
+            "hidden_fields": {} # We will consider this later
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"], # 5
-            "hidden_fields": [] # We will consider this later
+            "hidden_fields": {} # We will consider this later
         }
     }
 
@@ -235,10 +235,6 @@ What is the difference between global and local? - local is a higher priority an
 Hide fields
 -----------
 
-.. warning::
-
-    ``hidden_fields`` is a mandatory parameter, it must always be present
-
 .. code-block:: Python
 
     from django_contexter.models.method_types import ALL_METHODS
@@ -252,12 +248,12 @@ Hide fields
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"],
-            "hidden_fields": [] # 1
+            "hidden_fields": {} # 1
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"],
-            "hidden_fields": [] # 2
+            "hidden_fields": {} # 2
         }
     }
 
@@ -278,12 +274,12 @@ Let's try to hide ``codename`` from ``auth.Permission``:
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"],
-            "hidden_fields": [] # 1
+            "hidden_fields": {} # 1
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"],
-            "hidden_fields": ["codename"] # 2
+            "hidden_fields": {"codename": "********"} # 2
         }
     }
 
@@ -313,12 +309,15 @@ This works for several fields as well:
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"],
-            "hidden_fields": [] # 1
+            "hidden_fields": {} # 1
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"],
-            "hidden_fields": ["codename", "name"] # 2
+            "hidden_fields": {
+                "codename": "********",
+                "name": "****",
+            } # 2
         }
     }
 
@@ -366,13 +365,12 @@ We're reaching a new level of customizability:
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"],
-            "hidden_fields": []
+            "hidden_fields": {}
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"],
-            "hidden_fields": [], # 1
-            "codename": custom_hide # 2
+            "hidden_fields": {"codename": custom_hide},
         }
     }
 
