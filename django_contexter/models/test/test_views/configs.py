@@ -38,7 +38,7 @@ class Configs(object):
                 "allow_models": "__all__",
                 "reject_models": [],
                 "auth.Permission": {
-                    "hidden_fields": ["codename"],
+                    "hidden_fields": {"codename": "********"},
                     "allow_methods": ALL_METHODS,
                 },
             },

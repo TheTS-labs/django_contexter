@@ -18,12 +18,12 @@ class ChangeResultConfigTestCase(TestCase):
         changer = ChangeResult(None, Permission, None)
         self.assertEqual(changer.fix_fields(Permission.objects), Permission.objects)
 
-    def test_no_changes_in_simple_and_extended(self):
-        """Except no changes in record if field in hidden_fields AND recorded extended."""
-        changer = ChangeResult(
-            {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": ["codename"], "codename": {}},
-            Permission,
-            None,
-        )
+    # def test_no_changes_in_simple_and_extended(self):
+    #     """Except no changes in record if field in hidden_fields AND recorded extended."""
+    #     changer = ChangeResult(
+    #         {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": {"codename": ""}},
+    #         Permission,
+    #         None,
+    #     )
 
-        self.assertEqual(changer.fix_fields(Permission.objects), Permission.objects)
+    #     self.assertEqual(changer.fix_fields(Permission.objects), Permission.objects)

@@ -64,7 +64,7 @@ class MainTestCase(TestCase, Configs):
             ]))
 
             changer = ChangeResult(
-                {"hidden_fields": ["codename"], "allow_methods": ALL_METHODS},
+                {"hidden_fields": {"codename": "********"}, "allow_methods": ALL_METHODS},
                 Permission,
                 None,
             )
