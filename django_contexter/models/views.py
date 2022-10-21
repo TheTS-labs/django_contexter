@@ -19,7 +19,7 @@ from django_contexter.models.serializer import Serializer
 class Index(APIView):
     """Use API logic and return response."""
 
-    def get(self, request, format=None):
+    def get(self, request):
         """
         Return model records by GET parameters.
 
@@ -84,6 +84,12 @@ class Index(APIView):
 
         Args:
             exc: Exception inctance
+
+        Returns:
+            Response with error or re-raise the error
+
+        Raises:
+            exc: Re-raise the error if it is not a RequestError
         """
         if isinstance(exc, RequestError):
             return exc.response
