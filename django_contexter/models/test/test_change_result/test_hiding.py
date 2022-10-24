@@ -4,7 +4,7 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from django_contexter.models.change_result import ChangeResult
-from django_contexter.models.method_types import ALL_SAFE_METHODS
+from django_contexter.models.method_lists import ALL_SAFE_METHODS
 
 # ? Why need noqa: WPS437?
 # * Because Django doesn't forbid the use of _meta
@@ -16,8 +16,13 @@ def _to_be_hided(full_result, model, props, field, request):
 
 
 empty = frozenset()
-simple_hide = "SIMPLE_HIDE"
-standart_hide = ["codename"]
+codename_hide_str = "Hided"
+standart_hide = {
+    "codename": codename_hide_str,
+}
+fucntional_hide = {
+    "codename": _to_be_hided,
+}
 
 
 class ChangeResultTestCase(TestCase):
@@ -38,7 +43,7 @@ class ChangeResultTestCase(TestCase):
             standart_hide,
             records.all().first(),
             fixed_fields,
-            codename=simple_hide,
+            codename=codename_hide_str,
         )
         self._check_other_attrs(
             self._get_fileld_names_list(Permission, standart_hide),
@@ -62,7 +67,7 @@ class ChangeResultTestCase(TestCase):
                 standart_hide,
                 record,
                 fixed_field,
-                codename=simple_hide,
+                codename=codename_hide_str,
             )
             self._check_other_attrs(
                 self._get_fileld_names_list(Permission, standart_hide),
@@ -72,7 +77,8 @@ class ChangeResultTestCase(TestCase):
 
     def test_multiple_hide(self):
         """Intermediate++ Level: Hide many fields."""
-        hide = standart_hide + ["name"]
+        hide = {"name": "Hided"}
+        hide.update(standart_hide)
         changer = ChangeResult(
             {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": hide},
             Permission,
@@ -86,8 +92,8 @@ class ChangeResultTestCase(TestCase):
             hide,
             records.all().first(),
             fixed_fields,
-            codename=simple_hide,
-            name=simple_hide,
+            codename=codename_hide_str,
+            name="Hided",
         )
         self._check_other_attrs(
             self._get_fileld_names_list(Permission, hide),
@@ -98,7 +104,7 @@ class ChangeResultTestCase(TestCase):
     def test_custom_hide(self):
         """Hard Level: Use custom hide function."""
         changer = ChangeResult(
-            {"allow_methods": ALL_SAFE_METHODS, "codename": _to_be_hided, "hidden_fields": []},
+            {"allow_methods": ALL_SAFE_METHODS, "hidden_fields": fucntional_hide},
             Permission,
             None,
         )
@@ -135,7 +141,4 @@ class ChangeResultTestCase(TestCase):
     def _check_hided_attrs(self, hide_attrs, initial_queryset, testing_queryset, **kwargs):
         for attr in hide_attrs:
             self.assertNotEqual(getattr(initial_queryset, attr), getattr(testing_queryset, attr))
-            if kwargs.get(attr) == simple_hide:
-                self.assertEqual(getattr(testing_queryset, attr), "*" * len(attr))
-            else:
-                self.assertEqual(getattr(testing_queryset, attr), kwargs.get(attr))
+            self.assertEqual(getattr(testing_queryset, attr), kwargs.get(attr))

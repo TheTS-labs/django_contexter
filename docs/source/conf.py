@@ -6,10 +6,14 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-PROJECT = "Friendly Contexter"
+import toml
+
+config = toml.load("../../pyproject.toml")
+
+PROJECT = config["tool"]["poetry"]["name"]
 COPYRIGHT = "2022, Roman"
-AUTHOR = "Roman"
-REELASE = "0.5.2"
+AUTHOR = config["tool"]["poetry"]["authors"]
+REELASE = config["tool"]["poetry"]["version"]
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

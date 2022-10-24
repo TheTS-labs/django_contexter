@@ -4,7 +4,7 @@ from django.test import TestCase, override_settings
 
 from django_contexter.models.errors.request_error import RequestError
 from django_contexter.models.get_model import GetModel
-from django_contexter.models.method_types import ALL_SAFE_METHODS
+from django_contexter.models.method_lists import ALL_SAFE_METHODS
 
 
 class ModelErrorsTestCase(TestCase):

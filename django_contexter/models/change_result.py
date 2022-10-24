@@ -32,25 +32,25 @@ class ChangeResult(object):
 
         for field in self.model._meta.get_fields():  # noqa: WPS437
             if field.name in self.props["hidden_fields"]:
-                if field.name not in self.props:
-                    full_result = self._update(
-                        field.name, "*" * len(field.name), full_result,
+                field_config = self.props["hidden_fields"].get(field.name)
+                if callable(field_config):
+                    function_result = field_config(
+                        full_result=full_result,
+                        model=self.model,
+                        props=self.props,
+                        field=field,
+                        request=self.request,
                     )
-            elif field.name in self.props:
-                function_to_call = self.props.get(field.name)
-                function_result = function_to_call(
-                    full_result=full_result,
-                    model=self.model,
-                    props=self.props,
-                    field=field,
-                    request=self.request,
-                )
 
-                full_result = self._update(
-                    field.name,
-                    function_result,
-                    full_result,
-                )
+                    full_result = self._update(
+                        field.name,
+                        function_result,
+                        full_result,
+                    )
+                else:
+                    full_result = self._update(
+                        field.name, field_config, full_result,
+                    )
 
         return full_result
 

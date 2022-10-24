@@ -12,4 +12,4 @@ class ThirdPartyTestCase(TestCase):
         full = {"1": 1, "2": 2, "3": 3}
         expected = {"1": 1, "3": 3}
 
-        self.assertEqual(expected, views.Index()._exclude_keys(full, ["2"]))
+        self.assertEqual(expected, views.Index()._exclude_keys(full, ["2"]))  # noqa: WPS437

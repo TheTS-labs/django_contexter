@@ -1,4 +1,4 @@
-from django_contexter.models.method_types import ALL_METHODS, ALL_SAFE_METHODS
+from django_contexter.models.method_lists import ALL_METHODS, ALL_SAFE_METHODS
 
 # ? Why need noqa: WPS226?
 # * These are different variations of

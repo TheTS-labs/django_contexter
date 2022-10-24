@@ -1,6 +1,10 @@
 Model's API
 ===========
 
+.. warning::
+
+   Like Django context this API does not allow to change data (e.g. in a database)
+
 Instalation
 +++++++++++
 
@@ -37,11 +41,6 @@ Aliases
 
     Aliases are used as **strings**\ , not **lists**
 
-.. warning::
-
-    | Aliases **only** work with ``allow_models`` and ``reject_models``
-    | For methods use :ref:`QuerySet-API-method-lists`
-
 ``__all__``, ``__remaining__``, ``__any__`` and ``__undeclared__`` are aliases
 
 During processing, these aliases are replaced by lists:
@@ -49,7 +48,9 @@ During processing, these aliases are replaced by lists:
 * ``__all__`` is replaced by a list with **all** the models Django ORM knows about
 * ``__remaining__`` is replaced by all models *excluding the opposite setting*
 * ``__undeclared__`` is replaced by the list of models that are recorded extended
-* ``__any__`` specifically for allow_methods allows **any** method
+* ``__any__`` specifically for allow_methods allows **any** method\*
+
+\*Although we call __any__ an alias, in fact we just allow any method, any method at all (even one that does not exist)
 
 Global models access
 --------------------
@@ -62,7 +63,7 @@ This is an example of the simplest policy:
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -86,7 +87,7 @@ It's easy though, the previous configuration is not safe at all. What if someone
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -108,7 +109,7 @@ But to declare each prohibited model is very long and difficult - yes, so we can
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -130,7 +131,7 @@ Here's how you can:
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -144,7 +145,7 @@ Here's how you can:
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -158,7 +159,7 @@ Here's how you can:
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -200,7 +201,7 @@ What if we need to allow ``.get(**model_request)`` and ``.all()`` methods for ``
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -211,18 +212,18 @@ What if we need to allow ``.get(**model_request)`` and ``.all()`` methods for ``
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"], # 4
-            "hidden_fields": [] # We will consider this later
+            "hidden_fields": {} # We will consider this later
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"], # 5
-            "hidden_fields": [] # We will consider this later
+            "hidden_fields": {} # We will consider this later
         }
     }
 
 .. note::
 
-    __undeclared__ means all models that are recorded extended
+    __undeclared__ means all models that are not recorded extended
 
 1. **Globally** allow all methods
 2. **Globally** allow all models
@@ -235,13 +236,9 @@ What is the difference between global and local? - local is a higher priority an
 Hide fields
 -----------
 
-.. warning::
-
-    ``hidden_fields`` is a mandatory parameter, it must always be present
-
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -252,12 +249,12 @@ Hide fields
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"],
-            "hidden_fields": [] # 1
+            "hidden_fields": {} # 1
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"],
-            "hidden_fields": [] # 2
+            "hidden_fields": {} # 2
         }
     }
 
@@ -267,7 +264,7 @@ Let's try to hide ``codename`` from ``auth.Permission``:
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -278,12 +275,12 @@ Let's try to hide ``codename`` from ``auth.Permission``:
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"],
-            "hidden_fields": [] # 1
+            "hidden_fields": {} # 1
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"],
-            "hidden_fields": ["codename"] # 2
+            "hidden_fields": {"codename": "********"} # 2
         }
     }
 
@@ -302,7 +299,7 @@ This works for several fields as well:
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -313,12 +310,15 @@ This works for several fields as well:
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"],
-            "hidden_fields": [] # 1
+            "hidden_fields": {} # 1
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"],
-            "hidden_fields": ["codename", "name"] # 2
+            "hidden_fields": {
+                "codename": "********",
+                "name": "****",
+            } # 2
         }
     }
 
@@ -346,7 +346,7 @@ We're reaching a new level of customizability:
 
 .. code-block:: Python
 
-    from django_contexter.models.method_types import ALL_METHODS
+    from django_contexter.models.method_lists import ALL_METHODS
 
     # ...
 
@@ -366,27 +366,26 @@ We're reaching a new level of customizability:
 
         "auth.User": { # recorded extended
             "allow_methods": ["all", "get"],
-            "hidden_fields": []
+            "hidden_fields": {}
         },
 
         "auth.Permission": { # recorded extended
             "allow_methods": ["get"],
-            "hidden_fields": [], # 1
-            "codename": custom_hide # 2
+            "hidden_fields": {"codename": custom_hide},
         }
     }
 
 Console output:
 
-``admin | log entry | Can add log entry`` - full result
+``admin | log entry | Can add log entry`` - Full QuerySet by request, without any changes
 
-``<class 'django.contrib.auth.models.Permission'>`` - model object
+``<class 'django.contrib.auth.models.Permission'>`` - Request model object
 
-``{'allow_methods': ['get'], 'hidden_fields': [], 'codename': <function custom_hide at 0x7fe305d2b0a0>}`` - your config
+``{'allow_methods': ['get'], 'hidden_fields': [], 'codename': <function custom_hide at 0x7fe305d2b0a0>}`` - Local config from CONTEXTER_ACCESS_POLICY
 
-``auth.Permission.codename`` - field object
+``auth.Permission.codename`` - Model field object
 
-``<rest_framework.request.Request: GET '/api/models/?modelName=auth.Permission&get=%7B%22pk%22:%201%7D'>`` - request object
+``<rest_framework.request.Request: GET '/api/models/?modelName=auth.Permission&get=%7B%22pk%22:%201%7D'>`` - `Request object <https://docs.djangoproject.com/en/4.1/ref/request-response/#httprequest-objects>`_
 
 The server response:
 
@@ -405,54 +404,54 @@ The server response:
 
 As you can see, your method is called with the parameters ``full_result``, ``model``, ``props``, ``field``, ``request``
 
-And you can return any **text** - it will replace the field value
+And You can return any JSON serializable type - it will replace the field value
 
 .. _QuerySet-API-method-lists:
 
 QuerySet API method lists
 -------------------------
 
-.. option:: django_contexter.models.method_types.METHODS_THAT_RENTURN_NEW_QUERYSET
+.. option:: django_contexter.models.method_lists.METHODS_THAT_RENTURN_NEW_QUERYSET
 
    :description: Django provides a range of QuerySet refinement methods that modify either the types of results returned by the QuerySet or the way its SQL query is executed
 
    :link: `#methods-that-return-new-querysets <https://docs.djangoproject.com/en/4.1/ref/models/querysets/#methods-that-return-new-querysets>`_
 
-.. option:: django_contexter.models.method_types.METHODS_THAT_DO_NOT_RETURN_QUERYSET
+.. option:: django_contexter.models.method_lists.METHODS_THAT_DO_NOT_RETURN_QUERYSET
 
    :description: The following QuerySet methods evaluate the QuerySet and return something other than a QuerySet
 
    :link: `#methods-that-do-not-return-querysets <https://docs.djangoproject.com/en/4.1/ref/models/querysets/#methods-that-do-not-return-querysets>`_
 
-.. option:: django_contexter.models.method_types.METHODS_THAT_CHAGES_RECORDS
+.. option:: django_contexter.models.method_lists.METHODS_THAT_CHAGES_RECORDS
 
    :description: Methods for changing the database
 
-.. option:: django_contexter.models.method_types.ASYNC_METHODS_THAT_DO_NOT_RETURN_QUERYSET
+.. option:: django_contexter.models.method_lists.ASYNC_METHODS_THAT_DO_NOT_RETURN_QUERYSET
 
    :description: Same as ``METHODS_THAT_DO_NOT_RETURN_QUERYSET`` - asynchronous method variations
 
-.. option:: django_contexter.models.method_types.ASYNC_METHODS_THAT_CHAGES_RECORDS
+.. option:: django_contexter.models.method_lists.ASYNC_METHODS_THAT_CHAGES_RECORDS
 
    :description: Same as ``METHODS_THAT_CHAGES_RECORDS`` - asynchronous method variations
 
-.. option:: django_contexter.models.method_types.UNSAFE_METHODS
+.. option:: django_contexter.models.method_lists.UNSAFE_METHODS
 
    :description: Alias for ``METHODS_THAT_CHAGES_RECORDS``
 
-.. option:: django_contexter.models.method_types.ASYNC_UNSAFE_METHODS
+.. option:: django_contexter.models.method_lists.ASYNC_UNSAFE_METHODS
 
    :description: Alias for ``ASYNC_METHODS_THAT_CHAGES_RECORDS``
 
-.. option:: django_contexter.models.method_types.ALL_UNSAFE_METHODS
+.. option:: django_contexter.models.method_lists.ALL_UNSAFE_METHODS
 
    :description: ``ASYNC_METHODS_THAT_CHAGES_RECORDS`` and ``METHODS_THAT_CHAGES_RECORDS``
 
-.. option:: django_contexter.models.method_types.ALL_METHODS
+.. option:: django_contexter.models.method_lists.ALL_METHODS
 
    :description: All QuerySet API methods
 
-.. option:: django_contexter.models.method_types.ALL_SAFE_METHODS
+.. option:: django_contexter.models.method_lists.ALL_SAFE_METHODS
 
    :description: ``ALL_METHODS`` without ``ALL_UNSAFE_METHODS``
 
@@ -469,10 +468,6 @@ API Documentation
     |
     | This is omitted here, for example:
     | ``/api/models/?modelName=auth.Permission`` --> ``?modelName=auth.Permission``
-
-.. note::
-
-    Technically, this library supports all QuerySet API methods. But you still can't apply any changes to the database
 
 Parmeter\(s\)
 -------------
@@ -502,7 +497,7 @@ API Equivalent:
 
 .. code-block::
 
-    ?modelName=<MODEL_NAME>&all=&get={"pk": 1}
+    ?modelName=<MODEL_NAME>&all&get={"pk": 1}
 
 2. Or an example with filter\ **s**\ :
 
