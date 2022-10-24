@@ -7,7 +7,7 @@ from rest_framework import status
 from django_contexter.models import views
 from django_contexter.models.change_result import ChangeResult
 from django_contexter.models.errors.err_codes import FIELD_ERROR, FUNCTION_DOES_NOT_EXIST_IN_QUERYSET_API, REJECT_ERROR
-from django_contexter.models.method_types import ALL_METHODS, ALL_SAFE_METHODS
+from django_contexter.models.method_lists import ALL_METHODS, ALL_SAFE_METHODS
 from django_contexter.models.serializer import Serializer
 from django_contexter.models.test.test_views.configs import Configs
 

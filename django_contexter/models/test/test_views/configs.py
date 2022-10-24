@@ -2,7 +2,7 @@
 
 from types import MappingProxyType
 
-from django_contexter.models.method_types import ALL_METHODS, ALL_SAFE_METHODS
+from django_contexter.models.method_lists import ALL_METHODS, ALL_SAFE_METHODS
 
 SIMPLE_CONFIG = MappingProxyType({
     "allow_methods": ALL_SAFE_METHODS,

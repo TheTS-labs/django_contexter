@@ -4,7 +4,7 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 
 from django_contexter.models.change_result import ChangeResult
-from django_contexter.models.method_types import ALL_SAFE_METHODS
+from django_contexter.models.method_lists import ALL_SAFE_METHODS
 
 # ? Why need noqa: WPS437?
 # * Because Django doesn't forbid the use of _meta

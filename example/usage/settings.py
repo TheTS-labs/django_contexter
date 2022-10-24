@@ -15,7 +15,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from django_contexter.models.method_types import ALL_METHODS
+from django_contexter.models.method_lists import ALL_METHODS
 
 load_dotenv()
 
