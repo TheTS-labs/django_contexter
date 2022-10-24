@@ -1,7 +1,7 @@
 Migration Guides
 ================
 
-These version guides, which offer backward-compatible changes, will help you upgrade to the new version
+These version guides, which offer backward-uncompatible changes, will help you upgrade to the new version
 
 V1.0.0
 ++++++
