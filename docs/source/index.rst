@@ -5,10 +5,6 @@ Welcome to Django Contexter's documentation!
 
    This project is under active development
 
-.. warning::
-
-   Like Django context this API does not allow to change data (e.g. in a database)
-
 Get data from Django's backend with REST API
 
 Since not all frontend frameworks can use Django context directly, you can create an API. Or use an off-the-shelf API

@@ -1,6 +1,10 @@
 Model's API
 ===========
 
+.. warning::
+
+   Like Django context this API does not allow to change data (e.g. in a database)
+
 Instalation
 +++++++++++
 
